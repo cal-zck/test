@@ -30,7 +30,7 @@ public class AppDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        var masterKey = KeyVaultService.GetMasterKey();
+        var masterKey = KeyVaultService.GetMasterKey(SessionContext.ProfileFolder);
         var cryptoService = new CryptoService(masterKey);
 
         var stringEncryptionConverter = new ValueConverter<string, string>(
@@ -85,15 +85,15 @@ public class AppDbContext : DbContext
 
         modelBuilder.Entity<BorrowRecord>()
             .Property(b => b.SnapshotSubjectNumber)
-            .HasConversion(stringEncryptionConverter);
+            .HasConversion(nullableStringEncryptionConverter);
 
         modelBuilder.Entity<BorrowRecord>()
             .Property(b => b.SnapshotFileType)
-            .HasConversion(stringEncryptionConverter);
+            .HasConversion(nullableStringEncryptionConverter);
 
         modelBuilder.Entity<BorrowRecord>()
             .Property(b => b.SnapshotFileNumber)
-            .HasConversion(stringEncryptionConverter);
+            .HasConversion(nullableStringEncryptionConverter);
 
         //Disposed
 
@@ -113,7 +113,7 @@ public class AppDbContext : DbContext
 
         modelBuilder.Entity<EntryHistoryRecord>()
             .Property(e => e.FileName)
-            .HasConversion(stringEncryptionConverter);
+            .HasConversion(nullableStringEncryptionConverter);
 
         modelBuilder.Entity<EntryHistoryRecord>()
             .Property(e => e.FileType)
@@ -137,7 +137,8 @@ public class AppDbContext : DbContext
     {
         if (!optionsBuilder.IsConfigured)
         {
-            var appSettingsPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "appsettings.json");
+            var profileFolder = SessionContext.ProfileFolder;
+            var appSettingsPath = Path.Combine(profileFolder, "appsettings.json");
 
             if (File.Exists(appSettingsPath))
             {
@@ -146,10 +147,9 @@ public class AppDbContext : DbContext
 
                 if (!string.IsNullOrEmpty(encryptedConnString))
                 {
-                    var masterKey = KeyVaultService.GetMasterKey();
+                    var masterKey = KeyVaultService.GetMasterKey(profileFolder);
                     var cryptoService = new CryptoService(masterKey);
                     var plainTextConnString = cryptoService.Decrypt(encryptedConnString);
-
                     optionsBuilder.UseNpgsql(plainTextConnString);
                 }
             }
