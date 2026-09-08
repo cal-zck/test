@@ -39,27 +39,19 @@ public partial class LoginViewModel : ObservableObject
         HasActiveConnection = active != null;
         ActiveConnectionName = active != null ? active.DisplayName : "No database connected";
     }
-
+    
     [RelayCommand]
-    private void OpenConnectionManager(Window ownerWindow)
+    private void OpenConnectionSetup(Window ownerWindow)
     {
-        var window = new Views.ConnectionManagerWindow { Owner = ownerWindow };
+        var window = new Views.ConnectionSetupWindow { Owner = ownerWindow };
         if (window.ShowDialog() == true)
             RefreshActiveConnection();
     }
-
-    [RelayCommand]
-    private void OpenNewDatabaseWizard(Window ownerWindow)
-    {
-        var window = new Views.NewDatabaseWizardWindow { Owner = ownerWindow };
-        if (window.ShowDialog() == true)
-            RefreshActiveConnection();
-    }
-
+    
     [RelayCommand]
     private async Task LoginAsync(Window window)
     {
-        if (!HasActiveConnection)
+        if (!HasActiveConnection || SessionContext.ActiveProfile == null)
         {
             ErrorMessage = "Please connect to a database first.";
             return;
@@ -82,11 +74,20 @@ public partial class LoginViewModel : ObservableObject
             var matchedUser = allUsers.FirstOrDefault(u =>
                 string.Equals(u.Username, UsernameInput, StringComparison.OrdinalIgnoreCase));
 
-            if (matchedUser == null || !PasswordHasher.Verify(PasswordInput, matchedUser.PasswordHash))
+            var profileFolder = AppPaths.ProfileFolder(SessionContext.ActiveProfile.Id);
+
+            string masterKey = KeyVaultService.GetMasterKey(profileFolder); 
+            
+            var cryptoService = new CryptoService(masterKey);
+
+            string pepper = PepperStorageHelper.GetPepper(cryptoService);
+
+            if (matchedUser == null || !PasswordHasher.Verify(PasswordInput, matchedUser.PasswordHash, pepper))
             {
                 ErrorMessage = "Invalid username or password.";
                 return;
             }
+
 
             window.DialogResult = true;
         }
@@ -133,9 +134,11 @@ public partial class LoginViewModel : ObservableObject
             var canaryMeta = await context.AppSecurityMetas.FirstOrDefaultAsync();
             if (canaryMeta == null) throw new Exception("Security Canary missing from database.");
 
+
+            CryptoService cryptoService;
             try
             {
-                var cryptoService = new CryptoService(MasterKeyInput);
+                cryptoService = new CryptoService(MasterKeyInput);
                 cryptoService.Decrypt(canaryMeta.EncryptedCanary);
             }
             catch (CryptographicException)
@@ -143,6 +146,7 @@ public partial class LoginViewModel : ObservableObject
                 ErrorMessage = "Access Denied. Invalid Master Recovery Key.";
                 return;
             }
+
 
             var userToReset = await context.Users.FirstOrDefaultAsync();
             if (userToReset == null)
@@ -152,7 +156,10 @@ public partial class LoginViewModel : ObservableObject
             }
 
             userToReset.Username = NewUsernameInput;
-            userToReset.PasswordHash = PasswordHasher.Hash(NewPasswordInput);
+
+            string pepper = PepperStorageHelper.GetPepper(cryptoService);
+            userToReset.PasswordHash = PasswordHasher.Hash(NewPasswordInput, pepper);
+
 
             await context.SaveChangesAsync();
 

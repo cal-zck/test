@@ -276,14 +276,43 @@
             </Grid>
         </Border>
 
-        <Grid Grid.Column="1" Background="Transparent">
+        <Grid Grid.Column="1" Background="Transparent" ClipToBounds="True">
             <Grid.RowDefinitions>
                 <RowDefinition Height="74" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
+            <!-- Large Partially Visible Background Rangoli Art -->
+            <Grid Grid.RowSpan="2" HorizontalAlignment="Right" VerticalAlignment="Top" 
+                  Width="500" Height="500" Margin="0,-200,-200,0" Opacity="0.04" Panel.ZIndex="0">
+                
+                <!-- Outer Bounding Rings -->
+                <Ellipse Stroke="{DynamicResource PrimaryAccent}" StrokeThickness="4" />
+                <Ellipse Stroke="{DynamicResource PrimaryAccent}" StrokeThickness="1.5" Margin="24" />
+                <Ellipse Stroke="{DynamicResource PrimaryAccent}" StrokeThickness="1.5" Margin="32" StrokeDashArray="4 4" />
+
+                <!-- 8-Point Star Layer -->
+                <Border BorderBrush="{DynamicResource PrimaryAccent}" BorderThickness="3" Margin="60" RenderTransformOrigin="0.5,0.5">
+                    <Border.RenderTransform><RotateTransform Angle="0"/></Border.RenderTransform>
+                </Border>
+                <Border BorderBrush="{DynamicResource PrimaryAccent}" BorderThickness="3" Margin="60" RenderTransformOrigin="0.5,0.5">
+                    <Border.RenderTransform><RotateTransform Angle="45"/></Border.RenderTransform>
+                </Border>
+
+                <!-- Inner Floral Petals -->
+                <Grid Margin="90" RenderTransformOrigin="0.5,0.5">
+                    <Grid.RenderTransform><RotateTransform Angle="22.5"/></Grid.RenderTransform>
+                    <Ellipse Stroke="{DynamicResource PrimaryAccent}" StrokeThickness="2.5" Width="320" Height="70" />
+                    <Ellipse Stroke="{DynamicResource PrimaryAccent}" StrokeThickness="2.5" Width="70" Height="320" />
+                </Grid>
+
+                <!-- Center Core Rings -->
+                <Ellipse Stroke="{DynamicResource PrimaryAccent}" StrokeThickness="6" Width="100" Height="100" />
+                <Ellipse Fill="{DynamicResource PrimaryAccent}" Width="40" Height="40" />
+            </Grid>
+
             <Border Grid.Row="0" BorderBrush="{DynamicResource BorderColor}" BorderThickness="0,0,0,1"
-                    Background="Transparent" Padding="40,0">
+                    Background="Transparent" Padding="40,0" Panel.ZIndex="1">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" /> <ColumnDefinition Width="Auto" />
@@ -297,20 +326,14 @@
                     </StackPanel>
 
                     <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-
-                        <Border Background="{DynamicResource CardBackground}" CornerRadius="6" Padding="14,8"
-                                BorderBrush="{DynamicResource BorderColor}" BorderThickness="1" Margin="0,0,20,0">
-                            <StackPanel Orientation="Horizontal">
-                                <fa:ImageAwesome Icon="UserCircle" Width="14" Height="14"
-                                                 Foreground="{DynamicResource PrimaryAccent}" Margin="0,0,10,0" />
-                                <TextBlock Text="{x:Static loc:Strings.Main_WelcomeUser}"
-                                           Foreground="{DynamicResource TextMain}" FontWeight="SemiBold" FontSize="13"
-                                           VerticalAlignment="Center" />
-                            </StackPanel>
-                        </Border>
-
+                        
+                        <StackPanel Orientation="Horizontal">
+                            <fa:ImageAwesome Icon="UserCircle" Width="20" Height="20"
+                                             Foreground="{DynamicResource PrimaryAccent}" Margin="0,0,10,0" />
+                        </StackPanel>
+                        
                         <Button Command="{Binding ToggleThemeCommand}" Background="Transparent" BorderThickness="0"
-                                Margin="10,0" Cursor="Hand" ToolTip="{x:Static loc:Strings.Main_TooltipTheme}">
+                                Margin="10,0" Cursor="Hand" ToolTip="{x:Static loc:Strings.Main_TooltipTheme}" Panel.ZIndex="5">
                             <fa:ImageAwesome Icon="MoonOutline" Width="18" Height="18"
                                              Foreground="{DynamicResource PrimaryAccent}" />
                         </Button>
@@ -318,12 +341,12 @@
                 </Grid>
             </Border>
 
-            <ContentControl Grid.Row="1" Content="{Binding CurrentPageViewModel}" Margin="10,10,10,10" />
+            <ContentControl Grid.Row="1" Content="{Binding CurrentPageViewModel}" Margin="10,10,10,10" Panel.ZIndex="1" />
 
             <Border Grid.Row="1" Background="{DynamicResource DangerAccent}" CornerRadius="8" Padding="16,12"
                     HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,20,40,0"
                     Visibility="{Binding HasDisposalAlert, Converter={StaticResource BoolToVisConverter}}"
-                    Effect="{StaticResource Win11Shadow}">
+                    Effect="{StaticResource Win11Shadow}" Panel.ZIndex="10">
                 <StackPanel Orientation="Horizontal">
                     <fa:ImageAwesome Icon="Warning" Width="14" Height="14" Foreground="White" Margin="0,0,10,0"
                                      VerticalAlignment="Center" />

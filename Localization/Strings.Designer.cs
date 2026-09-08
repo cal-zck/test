@@ -1672,7 +1672,7 @@ namespace ArchivumWpf.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to WPS-Archive.
+        ///   Looks up a localized string similar to ArchivumWpf.
         /// </summary>
         public static string Main_WindowTitle {
             get {

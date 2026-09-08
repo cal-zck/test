@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.Windows;
+using ArchivumWpf.Localization;
 using ArchivumWpf.Models;
 using ArchivumWpf.Services;
 using CommunityToolkit.Mvvm.ComponentModel;

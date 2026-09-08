@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.Windows;
+using ArchivumWpf.Localization;
 using ArchivumWpf.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;

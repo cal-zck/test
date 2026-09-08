@@ -2,6 +2,7 @@
 using System.IO;
 using System.Windows;
 using System.Windows.Media.Imaging;
+using ArchivumWpf.Localization;
 using ArchivumWpf.Models;
 using ArchivumWpf.Services;
 using CommunityToolkit.Mvvm.ComponentModel;

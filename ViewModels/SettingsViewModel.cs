@@ -3,6 +3,7 @@ using System.IO;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Windows;
+using ArchivumWpf.Localization;
 using ArchivumWpf.Models;
 using ArchivumWpf.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
